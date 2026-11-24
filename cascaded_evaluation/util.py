@@ -89,7 +89,9 @@ class SelectiveClassificationUtil:
 
         # upper-bound condition for supremum
         def _upper_bound_condition(r: float, lam: float):
-            return binom.cdf(self.selective_risk(lam) * self.n_lambda(lam), self.n_lambda(lam), r) - self.delta
+            # round to the integer error count: risk * n is a float (e.g. 2.9999998), and binom.cdf floors it
+            num_errors = torch.round(self.selective_risk(lam) * self.n_lambda(lam))
+            return binom.cdf(num_errors, self.n_lambda(lam), r) - self.delta
 
         return brentq(_upper_bound_condition, 0, 0.9999, args=(lam,))
 
